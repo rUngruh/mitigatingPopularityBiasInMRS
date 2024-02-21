@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Recommender System Study - Instructions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #1DB954;
+            margin-top: 40px;
+            font-size: 28px;
+        }
+
+        p {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
+        }
+
+        button[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Instructions</h1>
+
+
+    {% if index == 0 %}
+    <p>
+        {% if insufficientItems == 'True' %}
+
+    <div id="introduction">
+
+        <b>Unfortunately, your data was not suitable for the algorithms that we used.</b>
+        <br>
+        Nevertheless, we are very interested in the results of the algorithm. We won't use them for our main evaluation,
+        but they can be useful for better understanding of the algorithm that we used.
+        If you would still like to participate, you can continue below. If not, you can close this window.
+        <br> <br>
+        At this point, you should have filled in the first questionnaire. If not, please click on <a
+            id="questionnaireLink" href="#" target="_blank">this link</a>.
+        <!-- The href attribute is set to "#" to prevent the page from reloading when the link is clicked -->
+
+        <br>
+        <br>
+        Do not close this window. When you're done with the questionnaire, click confirm.
+        <br>
+        <br>
+        <button id="confirmationBtn" onclick="confirmAndContinue()">Confirm</button>
+    </div>
+    <script>
+        function create_url() {
+            var user_id = encodeURIComponent("{{ user_id }}");
+            var questionnaire_url = "{{ questionnaire_url }}";
+            var link = questionnaire_url + "?user_id=" + user_id;
+            return link; // This function returns the constructed link
+        }
+        var linkElement = document.getElementById("questionnaireLink");
+        linkElement.href = create_url();
+    </script>
+    {% else %}
+
+    <div id="introduction">
+        At this point, you should have filled in the first questionnaire. If not, please click on <a
+            id="questionnaireLink" href="#" target="_blank">this link</a>.
+        Do not close this window. When you're done with the questionnaire, click confirm.
+        <br>
+        <br>
+        <button id="confirmationBtn" onclick="confirmAndContinue()">Confirm</button>
+    </div>
+    <script>
+        function create_url() {
+            var user_id = encodeURIComponent("{{ user_id }}");
+            var questionnaire_url = "{{ questionnaire_url }}";
+            var link = questionnaire_url + "?user_id=" + user_id;
+            return link; // This function returns the constructed link
+        }
+        var linkElement = document.getElementById("questionnaireLink");
+        linkElement.href = create_url();
+    </script>
+    {% endif %}
+    <script>
+        function confirmAndContinue() {
+
+
+            const introductionDiv = document.getElementById("introduction");
+            introductionDiv.parentNode.removeChild(introductionDiv);
+
+            const additionalText = document.createElement("p");
+            additionalText.innerHTML = `<p>If you filled in the initial questionnaire, you are now ready to proceed with the next part of the study.<br><br>
+                                                In this stage, you will find a playlist comprising 25 personalized and ranked recommendations 
+                                                curated exclusively based on your listening history and interests.
+                                                <br>
+                                                <b>Your task:</b> Please take some time to listen to the playlist. Explore the items and feel free to click on the titles to listen to previews of the recommended songs. 
+                                                Your objective is to discover 5 songs that genuinely resonate with you and that you would like to add to your personal playlist.
+                                                <br>
+                                                Once you have selected the 5 songs you enjoy the most, simply click on "continue" to proceed further.
+                                              </p>`;
+            document.body.appendChild(additionalText);
+
+            const continueBtn = document.createElement("button");
+            continueBtn.innerHTML = "Continue";
+            continueBtn.onclick = function () {
+                window.location.href = "/personalized_recommendations/" + {{ index }};
+        };
+        document.body.appendChild(continueBtn);
+                }
+    </script>
+    </p>
+    {% elif index in [1, 2] %}
+    <div id="introduction">
+        <b>Please fill in the questionnaire for "Study Part {{ index }}". Open it by clicking on the button below</b>
+        Do not close this tab. When you're done with the questionnaire, click confirm.
+        <br>
+        <br>
+        <button id="questionnaireBtn" onclick="openQuestionnaire()">Open Questionnaire</button>
+        <button id="confirmationBtn" onclick="confirmAndContinue()" disabled>Confirm</button>
+    </div>
+
+    <script>
+
+        function create_url() {
+            var user_id = encodeURIComponent("{{ user_id }}");
+            var questionnaire_url = "{{ questionnaire_url }}";
+            var condition = "{{ condition }}"
+            var post_num = "{{ index }}"
+            var link = questionnaire_url + "?user_id=" + user_id + "&condition=" + condition + "&post_num=" + post_num;
+            return link; // This function returns the constructed link
+        }
+
+
+        function openQuestionnaire(questionnaire_url) {
+            var questionnaire_link = create_url()
+            window.open(questionnaire_link, "_blank");
+            document.getElementById("confirmationBtn").disabled = false;
+        }
+
+
+        function confirmAndContinue() {
+
+
+            const introductionDiv = document.getElementById("introduction");
+            introductionDiv.parentNode.removeChild(introductionDiv);
+
+            const additionalText = document.createElement("p");
+            additionalText.innerHTML = `<p>If you filled in the questionnaire for <b>Study Part {{ index }}</b>, you are now ready to proceed with the next part of the study. If not, open it by clicking on <a id="questionnaireLink" href="#" target="_blank">this link</a>.
+                                                    <br><br>
+                                                    In this stage, you will find a playlist comprising 25 personalized and ranked recommendations 
+                                                curated exclusively based on your listening history and interests.
+                                                <br>
+                                                <b>Your task:</b> Please take some time to listen to the playlist. Explore the items and feel free to click on the titles to listen to previews of the recommended songs. 
+                                                Your objective is to discover 5 songs that genuinely resonate with you and that you would like to add to your personal playlist.
+                                                <br>
+                                                Once you have selected the 5 songs you enjoy the most, simply click on "continue" to proceed further.
+                                                </p>`;
+            document.body.appendChild(additionalText);
+
+
+
+            const continueBtn = document.createElement("button");
+            continueBtn.innerHTML = "Continue";
+            continueBtn.onclick = function () {
+                window.location.href = "/personalized_recommendations/" + {{ index }};
+        };
+        document.body.appendChild(continueBtn);
+
+        var linkElement = document.getElementById("questionnaireLink");
+        linkElement.href = create_url();
+
+                }
+
+    </script>
+    {% elif index == 3 %}
+    <div id="introduction">
+        <b>Please fill in the questionnaire for "Study Part {{ index }}". Open it by clicking on the button below</b>
+        Do not close this tab. When you're done with the questionnaire, click confirm.
+        <br>
+        <br>
+        <button id="questionnaireBtn" onclick="openQuestionnaire()">Open Questionnaire</button>
+        <button id="confirmationBtn" onclick="confirmAndContinue()" disabled>Confirm</button>
+    </div>
+
+    <script>
+        function create_url() {
+            var user_id = encodeURIComponent("{{ user_id }}");
+            var questionnaire_url = "{{ questionnaire_url }}";
+            var condition = "{{ condition }}"
+            var post_num = "{{ index }}"
+            var link = questionnaire_url + "?user_id=" + user_id + "&condition=" + condition + "&post_num=" + post_num;
+            return link; // This function returns the constructed link
+        }
+
+
+        function openQuestionnaire(questionnaire_url) {
+            var questionnaire_link = create_url()
+            window.open(questionnaire_link, "_blank");
+            document.getElementById("confirmationBtn").disabled = false;
+        }
+
+
+        function confirmAndContinue() {
+
+
+            const introductionDiv = document.getElementById("introduction");
+            introductionDiv.parentNode.removeChild(introductionDiv);
+
+            const additionalText = document.createElement("p");
+            additionalText.innerHTML = `<p>If you filled in the questionnaire for <b>Study Part {{ index }}</b>, you are now ready to proceed with the next part of the study. If not, open it by clicking on <a id="questionnaireLink" href="#" target="_blank">this link</a>.
+                    <br><br>
+                    For the final part, you will quickly observe another playlist. 
+                    Your task is to check whether you recognize the recommended songs and assess if they match your private listening history.
+                    <br>
+                    Please note that you do not have to spend much time on this part. Simply take a quick look at the playlist to get an impression of the songs. 
+                    <br>
+                    If you have a good impression of the songs in the playlist, click "continue."
+                                                    </p>`;
+            document.body.appendChild(additionalText);
+
+            const continueBtn = document.createElement("button");
+            continueBtn.innerHTML = "Continue";
+            continueBtn.onclick = function () {
+                window.location.href = "/personalized_recommendations/" + {{ index }};
+        };
+        document.body.appendChild(continueBtn);
+
+        var linkElement = document.getElementById("questionnaireLink");
+        linkElement.href = create_url();
+
+                }
+
+    </script>
+    {% endif %}
+
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Finalizing</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="introduction">
+    <h1>Final questionnaire</h1>
+    <p>Please fill in this final questionnaire by clicking on the button below. After this, you can save the playlists
+        to you Spotify profile if you'd like.</p>
+    <button id="openQuestionnaireButton" onclick="openQuestionnaire()">Open questionnaire</button>
+    </div>
+    <script>
+        function create_url() {
+            var user_id = encodeURIComponent("{{ user_id }}");
+            var questionnaire_url = "{{ questionnaire_url }}";
+            var link = questionnaire_url + "?user_id=" + user_id;
+            return link; // This function returns the constructed link
+        }
+        function openQuestionnaire() {
+            questionnaire_link = create_url();
+            // Redirect the user to the questionnaire link in a new tab
+            confirmQuestionnaire()
+            window.open(questionnaire_link, "_blank");
+
+            
+
+        }
+
+        function savePlaylist() {
+            // Redirect the user to the /save_playlist route
+            window.location.href = "/save_playlist";
+        }
+
+        function logout() {
+            // Redirect the user to the /logout route
+            window.location.href = "/logout";
+        }
+
+        function confirmQuestionnaire() {
+
+
+            const introductionDiv = document.getElementById("introduction");
+            introductionDiv.parentNode.removeChild(introductionDiv);
+
+            const additionalText = document.createElement("p");
+            additionalText.innerHTML = `    <h1>Thanks!</h1>
+                <p id="hiddenText">Thank you for using the tool and participating in our study. Please verify that you filled in the final questionnaire after observing the last playlist. If you didn't, you can open it by clicking on <a id="questionnaireLink" href="#" target="_blank">this link</a>.
+                    <br>
+                    If you'd like, you can save the recommended songs to a new playlist in your Spotify profile. To do so, please
+                    click the button below.
+                </p>
+            `;
+            document.body.appendChild(additionalText);
+
+
+
+            const saveBtn = document.createElement("button");
+            saveBtn.innerHTML = "Save Playlist";
+            saveBtn.onclick = savePlaylist
+
+            const logoutBtn = document.createElement("button");
+            logoutBtn.innerHTML = "Don't Save Playlist";
+            logoutBtn.onclick = logout
+
+            document.body.appendChild(saveBtn);
+            document.body.appendChild(logoutBtn);
+
+            var linkElement = document.getElementById("questionnaireLink");
+            linkElement.href = create_url();
+
+        }
+    </script>
+</body>
+
+</html>

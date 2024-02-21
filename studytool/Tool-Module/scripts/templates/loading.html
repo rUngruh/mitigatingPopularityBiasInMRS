@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Loading...</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .loader {
+            border: 16px solid #f3f3f3; /* Light grey */
+            border-top: 16px solid #1DB954; /* Green */
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            color: #1DB954;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        .text-field {
+            margin-top: 20px;
+        }
+        
+        button {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var user_id = "{{ user_id }}";
+            var job_id = "{{ job_id }}";
+            // Redirect to the personalized recommendations page when the computation is complete
+            pollStatus(user_id, job_id);
+        });
+    
+        function pollStatus(user_id, job_id) {
+            $.get("{{ url_for('check_status') }}", { user_id: user_id, job_id: job_id }, function(data) {
+                if (data === "completed") {
+                    // Redirect to the personalized recommendations page
+                    window.location.href = "{{ url_for('instruction_screen', index=0) }}";
+                } else {
+                    // Poll again after a short interval
+                    setTimeout(function() { pollStatus(user_id, job_id); }, 3000);
+                }
+            });
+        }
+    </script>
+    
+    </head>
+    <body>
+        <div class="loader"></div>
+        <h1>Loading...</h1>
+    
+        <div class="text-field">
+            <p> We create your personalized recommendations. This will take a few minutes. Fill in the questionnaire by clicking on the button below. Return to this tab when you are done.
+                This process should take about 5 minutes.
+            </p>
+        </div>
+
+        <!-- Add the "Open questionnaire" button below the text -->
+        <button onclick="openQuestionnaire()">Open questionnaire</button>
+
+        <script>
+            function openQuestionnaire() {
+                var user_id = encodeURIComponent("{{ user_id }}")
+                var questionnaire_url = "{{ questionnaire_url }}"
+                window.open(questionnaire_url + "?user_id=" + user_id, "_blank");
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Personalized Recommendations</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+            /* Add gap between columns */
+            box-sizing: border-box;
+            /* Include padding and borders within the specified width */
+            padding: 0 20px;
+            /* Adjust padding as desired */
+        }
+
+        .column {
+            flex: 1 1 300px;
+            /* Adjust the width as desired */
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: calc(70vh - 170px);
+            /* Adjust max-height to accommodate fixed elements */
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                /* Stack columns vertically on small screens */
+                align-items: center;
+            }
+
+            .column {
+                flex: 1 1 100%;
+                /* Make columns full width on small screens */
+                margin-bottom: 20px;
+                max-height: none;
+                /* Remove max-height on small screens */
+            }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 40px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        li:hover {
+            background-color: #f1f1f1;
+        }
+
+        .album-image {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .album-image-container {
+            position: relative;
+        }
+
+        /* Apply opacity to the play button */
+        .play-button {
+            opacity: 0.6;
+        }
+
+        /* Increase opacity when hovering over the play button */
+        .play-button:hover {
+            opacity: 0.8;
+        }
+
+        p {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        #spotify-player-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #preview-player-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #spotify-player {
+            width: 100%;
+            height: 100px;
+            border: none;
+            overflow: hidden;
+        }
+
+
+
+        .rank-number {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .selected {
+            visibility: visible;
+        }
+
+        .selected-counter {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .select-button {
+            margin-left: auto;
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .select-button:hover {
+            opacity: 1;
+        }
+
+        .select-button.unselect {
+            background-color: red;
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .select-button.unselect:hover {
+            opacity: 1;
+        }
+
+        .select-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        #counter-container {
+            position: fixed;
+            top: 10px;
+            left: 20px;
+            right: 20px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+        }
+
+        .counter-info {
+            flex-grow: 1;
+        }
+
+        .counter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .selected-counter {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            float: left;
+        }
+
+
+        .continue-button,
+        .logout-button {
+            background-color: #ccc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .continue-button:hover,
+        .logout-button:hover {
+            opacity: 1;
+        }
+
+        .continue-button.green {
+            background-color: #1DB954;
+        }
+
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .overlay-message {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .overlay-buttons {
+            margin-top: 20px;
+        }
+
+        .overlay-buttons button {
+            margin: 0 10px;
+        }
+
+        .overlay-button {
+            background-color: #ccc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .overlay-button:hover {
+            opacity: 1;
+        }
+
+        .overlay-button.green {
+            background-color: #1DB954;
+        }
+
+        #track-info {
+            display: flex;
+            align-items: center;
+        }
+
+        #player-wrapper {
+            flex: 0 0 auto;
+            margin-right: 10px;
+            /* Adjust the spacing as desired */
+        }
+
+        #cover-details {
+            display: flex;
+            align-items: center;
+        }
+
+        #cover-image {
+            width: 100px;
+            /* Adjust the size as desired */
+            height: auto;
+            margin-right: 10px;
+            /* Adjust the spacing as desired */
+        }
+
+        .spotify-link-button {
+            margin-left: 100px;
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            text-decoration: none;
+        }
+
+        .spotify-link-button:hover {
+            opacity: 1;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* Style for the play button triangle */
+        .play-button::before {
+            content: "";
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 0 10px 15px;
+            border-color: transparent transparent transparent white;
+            opacity: 0.8;
+        }
+
+
+    </style>
+    <script>
+        var recommended_track_uris = [];
+        var recommended_track_names = [];
+        var recommended_track_artists = [];
+        var recommended_track_images = [];
+
+        var selectedSongs = [];
+        var counter = 0;
+
+        var startTime = new Date().getTime(); // Track the start time
+
+
+        function addTrack(uri, name, artist, image) {
+            recommended_track_uris.push(uri);
+            recommended_track_names.push(name);
+            recommended_track_artists.push(artist);
+            recommended_track_images.push(image)
+        }
+
+        // Loop through the recommended tracks and call addTrack function for each track
+        {% for track in recommended_tracks %}
+        addTrack('{{ track.uri }}', '{{ track.name }}', '{{ track.artist }}', '{{ track.image }}');
+        {% endfor %}
+
+        function playTrack(uri, previewUrl, coverImage, trackTitle, artistName, spotifyURL) {
+            var player = document.getElementById('preview-player');
+            var playerContainer = document.getElementById('preview-player-container');
+            var spotifyPlayerContainer = document.getElementById('spotify-player-container');
+            var oldPlayer = document.getElementById('spotify-player');
+            console.log(previewUrl)
+            if (previewUrl === null || previewUrl === "None") {
+                // Use the old player if no preview is available
+                playerContainer.style.display = 'none';
+                spotifyPlayerContainer.style.display = 'block';
+
+                player.pause();
+
+                
+                oldPlayer.src = 'https://open.spotify.com/embed/track/' + uri.split(':')[2];
+            } else {
+                // Use the preview URL
+                player.src = previewUrl;
+                playerContainer.style.display = 'block';
+                spotifyPlayerContainer.style.display = 'none';
+
+                oldPlayer.src = '';
+
+
+                var coverImageElement = document.getElementById('cover-image');
+                coverImageElement.src = coverImage;
+
+                var trackTitleElement = document.getElementById('track-title');
+                trackTitleElement.textContent = trackTitle;
+
+                var artistNameElement = document.getElementById('artist-name');
+                artistNameElement.textContent = artistName;
+                
+                var spotifyLinkButton = document.getElementById("spotify-link-button");
+
+                
+                spotifyLinkButton.setAttribute("href", spotifyURL);
+
+                spotifyLinkButton.addEventListener("click", function(event) {
+                    event.preventDefault();
+
+                    // Open the Spotify link in a new tab
+                    window.open(spotifyURL, "_blank");
+                });
+                player.play();
+
+            }
+        }
+
+
+
+
+
+
+        function updateCounter() {
+            var counterElement = document.getElementById('selected-counter');
+            counterElement.textContent = 'Selected Songs: ' + counter;
+        }
+
+        function logoutFromSpotify() {
+            // Redirect the user to the /logout route
+            window.location.href = "/logout";
+        }
+
+        function updateContinueButton() {
+            var continueButton = document.querySelector('.continue-button');
+            if (counter >= 5) {
+                continueButton.classList.add('green');
+            } else {
+                continueButton.classList.remove('green');
+            }
+        }
+
+        function selectSong(uri, element, event) {
+            event.stopPropagation(); // Prevent event propagation
+
+            var index = selectedSongs.indexOf(uri);
+            if (index > -1) {
+                selectedSongs.splice(index, 1);
+                element.classList.remove('selected');
+                element.classList.remove('unselect');
+                counter--;
+                element.textContent = 'Select';
+                removeSongFromSelected(uri); // Call the function to remove the song from the right column
+            } else {
+                if (counter >= 5) {
+                    return; // Exit the function if the user has already selected 5 songs
+                }
+                selectedSongs.push(uri);
+                element.classList.add('selected');
+                counter++;
+                element.textContent = 'Unselect';
+                element.classList.add('unselect');
+                updateSelectedSongs(uri); // Call the function to add the song to the right column
+            }
+            updateCounter();
+            updateContinueButton();
+
+            // Disable selection buttons if the user has selected 5 songs
+            var selectButtons = document.getElementsByClassName('select-button');
+            for (var i = 0; i < selectButtons.length; i++) {
+                var button = selectButtons[i];
+                if (counter >= 5 && !button.classList.contains('selected')) {
+                    button.disabled = true; // Disable select buttons except for the "Unselect" buttons
+                } else {
+                    button.disabled = false; // Enable select buttons
+                }
+            }
+        }
+
+        function updateSelectedSongs(uri) {
+            var selectedSongsContainer = document.querySelector('.column:last-child');
+            selectedSongsContainer.innerHTML = '<h2>Your Selected Songs</h2>';
+
+            for (var i = 0; i < selectedSongs.length; i++) {
+                var songUri = selectedSongs[i];
+                var songIndex = recommended_track_uris.indexOf(songUri);
+
+                if (songIndex > -1) {
+                    var songName = recommended_track_names[songIndex];
+                    var songArtist = recommended_track_artists[songIndex];
+                    var songImage = recommended_track_images[songIndex];
+
+                    var songElement = document.createElement('li');
+                    songElement.innerHTML = `
+                <span class="rank-number">${i + 1}</span>
+                <div class="album-image-container">
+                        <!-- Play button -->
+                        <div class="play-button"></div>
+                        <img class="album-image" src="${songImage}" alt="Album Art">
+                    </div>
+                <div>
+                    <p><strong>${songName}</strong></p>
+                    <p>${songArtist}</p>
+                </div>
+                <button class="select-button unselect selected" onclick="selectSong('${songUri}', this, event)">Unselect</button>
+                `;
+
+                    selectedSongsContainer.appendChild(songElement);
+                }
+            }
+
+        }
+
+        function removeSongFromSelected(uri) {
+            var selectedSongsContainer = document.querySelector('.column:last-child');
+            var selectedSongElements = selectedSongsContainer.getElementsByTagName('li');
+            for (var i = 0; i < selectedSongElements.length; i++) {
+                var songElement = selectedSongElements[i];
+                var songUri = songElement.querySelector('.select-button').getAttribute('onclick');
+                if (songUri.includes(uri)) {
+                    // Update the button text in the left column
+                    var leftColumnSongElements = document.querySelectorAll('.column:first-child li');
+                    for (var j = 0; j < leftColumnSongElements.length; j++) {
+                        var leftColumnSongUri = leftColumnSongElements[j].querySelector('.select-button').getAttribute('onclick');
+                        if (leftColumnSongUri.includes(uri)) {
+                            leftColumnSongElements[j].querySelector('.select-button').textContent = 'Select';
+                            leftColumnSongElements[j].querySelector('.select-button').classList.remove('unselect');
+                            break;
+                        }
+                    }
+
+                    selectedSongsContainer.removeChild(songElement);
+                    break;
+                }
+            }
+        }
+
+
+
+
+
+
+
+    </script>
+
+</head>
+
+<body>
+    <h1>Study Part {{index + 1}}</h1>
+
+    <p>Please explore the playlists and listen to songs by clicking their cover image. Discover 5 tracks you'd like to add to your personal playlist. Click the "Play" button on the right for songs which do not play automatically.
+        <br>
+        Click "Continue" after selecting your favorites!   </p>
+
+    <div id="counter-container">
+        <div class="counter-info">
+            <div class="selected-counter" id="selected-counter">Selected Songs: 0</div>
+        </div>
+        <div class="counter-buttons">
+            <button class="continue-button" onclick="showOverlay()">Continue</button>
+            <button class="logout-button" onclick="logoutFromSpotify()">Log Out</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="column">
+            <h2>Your Personalized Recommendations</h2>
+            <ul>
+                {% for track in recommended_tracks %}
+                <li onclick="playTrack(
+                    '{{ track.uri }}',
+                    '{{ track.preview_url }}',
+                    '{{ track.image }}',
+                    '{{ track.name }}',
+                    '{{ track.artist }}',
+                    '{{ track.spotify_url}}'
+                )">
+                    <span class="rank-number">{{ loop.index }}</span>
+                    <div class="album-image-container">
+                        <!-- Play button -->
+                        <div class="play-button"></div>
+                        <img class="album-image" src="{{ track.image }}" alt="Album Art">
+                    </div>
+                    <div>
+                        <p><strong>{{ track.name }}</strong></p>
+                        <p>{{ track.artist }}</p>
+                        <p>{{ track.album }}</p>
+                    </div>
+                    <button class="select-button" onclick="selectSong('{{ track.uri }}', this, event)">Select</button>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="column">
+            <h2>Your Selected Songs</h2>
+            <!-- Content for displaying selected songs will be added dynamically -->
+        </div>
+    </div>
+
+    <div id="preview-player-container">
+        <div id="track-info">
+            <div id="player-wrapper">
+                <audio id="preview-player" controls></audio>
+            </div>
+            <div id="cover-details">
+                <img id="cover-image" src="" alt="Cover Image">
+                <div id="track-details">
+                    <h3 id="track-title"></h3>
+                    <p id="artist-name"></p>
+                </div>
+            <div id="spotify-link">
+                <a id="spotify-link-button" class="spotify-link-button" href="#" target="_blank">Show on Spotify</a>
+            </div>
+                  
+            </div>
+        </div>
+    </div>
+    
+    <div id="spotify-player-container">
+        <iframe id="spotify-player" src="" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+    </div>
+
+
+
+    <script>
+        function continueToNextStep() {
+            var endTime = new Date().getTime();
+            var timeSpentSeconds = Math.floor((endTime - startTime) / 1000);
+            var track_ranks = [];
+
+            for (var i = 0; i < selectedSongs.length; i++) {
+                var songUri = selectedSongs[i];
+                var rank = recommended_track_uris.indexOf(songUri);
+                track_ranks.push(rank);
+            }
+
+            // Redirect the user to the next step (instruction_screen)
+            var nextIndex = {{ index + 1}}; // Increment the index by 1
+        var url = "/instruction_screen/" + nextIndex + "?time=" + timeSpentSeconds + "&uris=" + encodeURIComponent(JSON.stringify(selectedSongs)) + "&ranks=" + encodeURIComponent(JSON.stringify(track_ranks));
+        window.location.href = url;
+        }
+
+
+        function showOverlay() {
+            var overlay = document.createElement('div');
+            overlay.classList.add('overlay');
+
+            var overlayMessage = document.createElement('div');
+            overlayMessage.classList.add('overlay-message');
+
+
+
+
+            if (counter < 5) {
+                overlayMessage.textContent = "You have selected less than 5 songs. Please select 5 songs.";
+            } else if (counter === 5) {
+                overlayMessage.textContent = "You selected 5 songs. You cannot discover the other songs in this playlist anymore if you continue. Are you sure?";
+            }
+
+            var overlayButtons = document.createElement('div');
+            overlayButtons.classList.add('overlay-buttons');
+
+            if (counter == 5)
+            {
+                var continueButton = document.createElement('button');
+                continueButton.textContent = 'Continue';
+                continueButton.classList.add('overlay-button');
+                continueButton.addEventListener('click', function () {
+                    overlay.remove(); // Remove the overlay when Continue is clicked
+                    continueToNextStep();
+                });
+            overlayButtons.appendChild(continueButton);
+            }
+
+            var cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.classList.add('overlay-button');
+            cancelButton.addEventListener('click', function () {
+                overlay.remove(); // Remove the overlay when Cancel is clicked
+            });
+
+            overlayButtons.appendChild(cancelButton);
+
+            overlayMessage.appendChild(overlayButtons);
+            overlay.appendChild(overlayMessage);
+            document.body.appendChild(overlay);
+        }
+    </script>
+</body>
+
+</html>

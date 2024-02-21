@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profile Validation</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+            /* Add gap between columns */
+            box-sizing: border-box;
+            /* Include padding and borders within the specified width */
+            padding: 0 20px;
+            /* Adjust padding as desired */
+        }
+
+        .column {
+            flex: 1 1 300px;
+            /* Adjust the width as desired */
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: calc(70vh - 170px);
+            /* Adjust max-height to accommodate fixed elements */
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                /* Stack columns vertically on small screens */
+                align-items: center;
+            }
+
+            .column {
+                flex: 1 1 100%;
+                /* Make columns full width on small screens */
+                margin-bottom: 20px;
+                max-height: none;
+                /* Remove max-height on small screens */
+            }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 100px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        li:hover {
+            background-color: #f1f1f1;
+        }
+
+        .album-image {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .album-image-container {
+            position: relative;
+        }
+
+        /* Apply opacity to the play button */
+        .play-button {
+            opacity: 0.6;
+        }
+
+        /* Increase opacity when hovering over the play button */
+        .play-button:hover {
+            opacity: 0.8;
+        }
+
+        p {
+            margin: 0;
+            font-size: 20px;
+        }
+        #spotify-player-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #preview-player-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #spotify-player {
+            width: 100%;
+            height: 100px;
+            border: none;
+            overflow: hidden;
+        }
+
+
+        #counter-container {
+            position: fixed;
+            top: 10px;
+            left: 20px;
+            right: 20px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+        }
+
+        .counter-info {
+            flex-grow: 1;
+        }
+
+        .counter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .selected-counter {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            float: left;
+        }
+
+
+        .continue-button,
+        .logout-button {
+            background-color: #ccc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .continue-button:hover,
+        .logout-button:hover {
+            opacity: 1;
+        }
+
+
+        .selected-counter {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        #track-info {
+            display: flex;
+            align-items: center;
+        }
+
+        #player-wrapper {
+            flex: 0 0 auto;
+            margin-right: 10px;
+            /* Adjust the spacing as desired */
+        }
+
+        #cover-details {
+            display: flex;
+            align-items: center;
+        }
+
+        #cover-image {
+            width: 100px;
+            /* Adjust the size as desired */
+            height: auto;
+            margin-right: 10px;
+            /* Adjust the spacing as desired */
+        }
+
+        .spotify-link-button {
+            margin-left: 100px;
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            text-decoration: none;
+        }
+
+        .spotify-link-button:hover {
+            opacity: 1;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* Style for the play button triangle */
+        .play-button::before {
+            content: "";
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 0 10px 15px;
+            border-color: transparent transparent transparent white;
+            opacity: 0.8;
+        }
+    </style>
+    <script>
+        var startTime = new Date().getTime();
+
+        function playTrack(uri, previewUrl, coverImage, trackTitle, artistName, spotifyURL) {
+            var player = document.getElementById('preview-player');
+            var oldPlayer = document.getElementById('spotify-player');
+            var playerContainer = document.getElementById('preview-player-container');
+            var spotifyPlayerContainer = document.getElementById('spotify-player-container');
+            console.log(previewUrl)
+            if (previewUrl === null || previewUrl === "None") {
+                // Use the old player if no preview URL is available
+                playerContainer.style.display = 'none';
+                spotifyPlayerContainer.style.display = 'block';
+
+                player.pause();
+
+                
+                oldPlayer.src = 'https://open.spotify.com/embed/track/' + uri.split(':')[2];
+            } else {
+                // Use the preview URL and generate a new player
+
+                player.src = previewUrl;
+                playerContainer.style.display = 'block';
+                spotifyPlayerContainer.style.display = 'none';
+
+                oldPlayer.src = '';
+
+                var coverImageElement = document.getElementById('cover-image');
+                coverImageElement.src = coverImage;
+
+                var trackTitleElement = document.getElementById('track-title');
+                trackTitleElement.textContent = trackTitle;
+
+                var artistNameElement = document.getElementById('artist-name');
+                artistNameElement.textContent = artistName;
+                
+                var spotifyLinkButton = document.getElementById("spotify-link-button");
+
+                
+                spotifyLinkButton.setAttribute("href", spotifyURL);
+
+                spotifyLinkButton.addEventListener("click", function(event) {
+                    event.preventDefault();
+
+                    // Open the Spotify link in a new tab
+                    window.open(spotifyURL, "_blank");
+                });
+                player.play();
+
+            }
+
+           
+        }
+
+        function logoutFromSpotify() {
+            // Redirect the user to the /logout route
+            window.location.href = "/logout";
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <h1>Profile Validation</h1>
+
+    <p>Please take a moment to briefly observe this playlist. Consider whether you are familiar with these songs and if they align with your typical listening history. 
+        <br>
+        Once you have formed an impression of the songs in the playlist, click on "continue."</p>
+
+    <div id="counter-container">
+        <div class="counter-info">
+            <div class="selected-counter" id="selected-counter">Selected Songs: 0</div>
+        </div>
+        <div class="counter-buttons">
+            <button class="continue-button" onclick="continueToNextStep()">Continue</button>
+            <button class="logout-button" onclick="logoutFromSpotify()">Log Out</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="column">
+            <h2>Your Playlist</h2>
+            <ul>
+                {% for track in recommended_tracks %}
+                <li onclick="playTrack(
+                    '{{ track.uri }}',
+                    '{{ track.preview_url }}',
+                    '{{ track.image }}',
+                    '{{ track.name }}',
+                    '{{ track.artist }}',
+                    '{{ track.spotify_url}}'
+                )">
+                    <div class="album-image-container">
+                        <!-- Play button -->
+                        <div class="play-button"></div>
+                        <img class="album-image" src="{{ track.image }}" alt="Album Art">
+                    </div>
+                    <div>
+                        <p><strong>{{ track.name }}</strong></p>
+                        <p>{{ track.artist }}</p>
+                        <p>{{ track.album }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div id="preview-player-container">
+        <div id="track-info">
+            <div id="player-wrapper">
+                <audio id="preview-player" controls></audio>
+            </div>
+            <div id="cover-details">
+                <img id="cover-image" src="" alt="Cover Image">
+                <div id="track-details">
+                    <h3 id="track-title"></h3>
+                    <p id="artist-name"></p>
+                    <!-- Spotify link button -->
+                    <a id="spotify-link-button" class="spotify-link-button" href="#" target="_blank">Show on Spotify</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="spotify-player-container">
+        <iframe id="spotify-player" src="" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+    </div>
+
+    <script>
+        function continueToNextStep() {
+            var endTime = new Date().getTime();
+            var timeSpentSeconds = Math.floor((endTime - startTime) / 1000);
+            var selectedSongs = [];
+
+            // Redirect the user to the next step (instruction_screen)
+            var nextIndex = {{ index + 1 }}; // Increment the index by 1
+        var url = "/instruction_screen/" + nextIndex + "?time=" + timeSpentSeconds + "&uris=" + encodeURIComponent(JSON.stringify(selectedSongs));
+        window.location.href = url;
+        }
+
+    </script>
+</body>
+
+</html>

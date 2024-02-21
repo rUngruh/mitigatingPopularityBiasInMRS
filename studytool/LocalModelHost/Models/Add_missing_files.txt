@@ -1,0 +1,3 @@
+Add the model file here. Pay attention to name the file correctly(see 
+"\Study\LocalModelHost\scripts\LFMRecommendations\Recommending\model_handler.py")
+

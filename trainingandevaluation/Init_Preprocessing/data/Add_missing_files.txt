@@ -1,0 +1,14 @@
+Add here the the raw files from http://www.cp.jku.at/datasets/LFM-2b/
+- raw/listening-counts.tsv.bz2
+- raw/spotify_uris.tsv.bz2
+
+Generate the following files and save here:
+- data/Processed/reduced_listening_counts.csv
+- data/Processed/track_popularity.csv
+- data/Processed/user_profiles.csv
+- data/Processed/spotify_uris.csv
+- data/Matrics/init_A_matrix.npz
+- data/Matrics/init_R_matrix.npz
+- data/Matrics/init_mappings.npz
+- data/Matrics/A_test.npz
+- data/Matrics/A_train.npz

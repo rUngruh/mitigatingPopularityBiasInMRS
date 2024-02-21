@@ -1,0 +1,23 @@
+Add here the preprocessed files:
+(only necessary if you want to use a subset, for more information on how to generate and use it, see scripts/subset_evaluator.py)
+- Evaluation/testset/profile_average_popularity.csv
+- Evaluation/testset/profile_popularity_means.pkl
+- Evaluation/testset/profile_popularity_medians.pkl
+- Evaluation/testset/profile_popularity_ratios.csv
+- Evaluation/testset/profile_popularity_variances.pkl
+- Evaluation/testset/profile_track_ids.pkl
+
+(required for full evaluation and training, refer to the Init_Preprocessing module)
+- Evaluation/A_test.npz
+- Evaluation/A_train.npz
+- Evaluation/init_mappings.npz
+- Evaluation/track_popularity.csv
+- Evaluation/user_profiles.csv
+
+- Training/A_test.npz
+- Training/A_train.npz
+- Training/init_mappings.npz
+
+
+
+
