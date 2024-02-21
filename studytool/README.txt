@@ -8,5 +8,5 @@ This code can easily be adapted to be used with other recommendation and mitigat
 The tool directories work together as two modules, where Tool-Module handles the study tool and the processing of the Spotify API, as well as, the re-ranking. 
 The LocalModelHost handles the trained recommendation algorithm on a server. For more information, read the readme's of the respective modules.
 
-This code does not include the needed data and trained models. Those can be replicated using the code from: ### add git with code for training ###
-Please observe both modules readme's there to generate the needed data.
+This code does not include the needed data and trained models. Those can be replicated using the code from: trainingandevaluation.
+Please observe both modules readme's in this directory to generate the needed data.
