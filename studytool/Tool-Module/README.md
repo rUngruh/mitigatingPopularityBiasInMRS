@@ -1,9 +1,9 @@
 # The Study Tool
-This module includes the full **tool** used for the study. This was deployed to [Heroku](https://www.heroku.com/) and only works in combination with the **LocalModelHost**. 
+This module includes the full **tool** used for the study. This was deployed to [Heroku](https://www.heroku.com/) and only works in combination with the `LocalModelHost`. 
 
 ## General Information
 The module handles the displaying of templates, the saving of interaction data by sending emails.
-By deploying it to Heroku, you will be able to run the study yourself. In **scripts/LFMRecommendations/recommendation_handler.py**, the recommendations are created and returned to the application. 
+By deploying it to Heroku, you will be able to run the study yourself. In `scripts/LFMRecommendations/recommendation_handler.py`, the recommendations are created and returned to the application. 
 For creating different types of recommendations consider changing the computations done in this script and its imports. 
 Additionally, you will need to add the questionnaires. Change their urls in the credentials.env or Config Vars on Heroku (depending on whether you want to run this tool online or on a local computer).
 
@@ -26,8 +26,8 @@ Making this script running properly on Heroku is an extensive process. We will p
 ### Deploying on Heroku
 
 For deploying and running the module accomplish the following steps:
-0. Set your email address and secret in the **scripts\Application\logging.py**
-1. Upload this directory to git. Make sure, the **requirements.txt** and **runtime.txt** are up to date.
+0. Set your email address and secret in the `scripts\Application\logging.py`
+1. Upload this directory to git. Make sure, the `requirements.txt` and `runtime.txt` are up to date.
 2. Create a Heroku account. Heroku provides free credits for students that have a GitHub Student Developer account. Activate your credits at https://www.heroku.com/students
 3. Create a [Heroku](https://www.heroku.com/) project.
 4. Go to the Deploy tab. Deploy this project using git. (Manual deploys using Github was the most convenient for me)
@@ -84,6 +84,6 @@ When ready to conduct the study, consider the following aspects. These step-by-s
 
 ## Remark: 
 **Please add the data to the correct paths**, see:
-- Study-Tool\LocalModelHost\data\Add_missing_files.txt
-- Study-Tool\LocalModelHost\Models\Add_missing_files.txt
-- Study-Tool\Tool-Module\data\Add_missing_files.txt
+- `Study-Tool\LocalModelHost\data\Add_missing_files.txt`
+- `Study-Tool\LocalModelHost\Models\Add_missing_files.txt`
+- `Study-Tool\Tool-Module\data\Add_missing_files.txt`
